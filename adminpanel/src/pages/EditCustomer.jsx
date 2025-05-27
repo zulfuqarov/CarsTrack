@@ -9,6 +9,8 @@ import {
   Typography,
   MenuItem,
   IconButton,
+  Dialog,
+  DialogContent,
 } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
@@ -50,6 +52,7 @@ function EditCustomer() {
   });
 
   const theme = useTheme();
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     fetchCustomer();
@@ -141,6 +144,14 @@ function EditCustomer() {
     } catch (error) {
       console.error('Error updating customer:', error);
     }
+  };
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedImage(null);
   };
 
   const imageCategories = [
@@ -500,6 +511,7 @@ function EditCustomer() {
                           borderRadius: 2,
                           overflow: 'hidden',
                           boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
+                          border: `2px solid ${theme.palette.primary.main}`,
                         }}
                       >
                         <img
@@ -511,21 +523,49 @@ function EditCustomer() {
                             objectFit: 'cover',
                           }}
                         />
-                        <IconButton
-                          size="small"
+                        <Box
                           sx={{
                             position: 'absolute',
-                            top: 4,
-                            right: 4,
-                            bgcolor: alpha(theme.palette.common.white, 0.9),
-                            '&:hover': {
-                              bgcolor: theme.palette.common.white,
-                            },
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            p: 1,
+                            background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
                           }}
-                          onClick={() => handleRemoveImage(category.key, index)}
                         >
-                          <DeleteIcon />
-                        </IconButton>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => handleImageClick(image)}
+                            sx={{
+                              minWidth: 'auto',
+                              px: 1,
+                              py: 0.5,
+                              fontSize: '0.75rem',
+                              bgcolor: alpha(theme.palette.common.white, 0.9),
+                              color: theme.palette.text.primary,
+                              '&:hover': {
+                                bgcolor: theme.palette.common.white,
+                              },
+                            }}
+                          >
+                            Bax
+                          </Button>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              bgcolor: alpha(theme.palette.common.white, 0.9),
+                              '&:hover': {
+                                bgcolor: theme.palette.common.white,
+                              },
+                            }}
+                            onClick={() => handleRemoveImage(category.key, index)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
                       </Box>
                     ))}
                   </Box>
@@ -600,6 +640,41 @@ function EditCustomer() {
           </Grid>
         </form>
       </Paper>
+
+      <Dialog
+        open={Boolean(selectedImage)}
+        onClose={handleCloseModal}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent sx={{ p: 0, position: 'relative' }}>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Selected"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+              }}
+            />
+          )}
+          <IconButton
+            onClick={handleCloseModal}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              bgcolor: alpha(theme.palette.common.white, 0.9),
+              '&:hover': {
+                bgcolor: theme.palette.common.white,
+              },
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }
