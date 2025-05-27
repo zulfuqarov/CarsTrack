@@ -11,8 +11,13 @@ import {
   IconButton,
   Dialog,
   DialogContent,
+  CircularProgress,
 } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { format } from 'date-fns';
 import axios from 'axios';
 import { alpha } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
@@ -21,6 +26,8 @@ import API_ENDPOINTS from '../config/api';
 function AddCustomer() {
   const navigate = useNavigate();
   const theme = useTheme();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -124,6 +131,7 @@ function AddCustomer() {
   };
 
   const uploadImagesToCloudinary = async (images, category) => {
+    setUploadingImages(prev => ({ ...prev, [category]: true }));
     const formData = new FormData();
     images.forEach(({ file }) => {
       const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
@@ -146,11 +154,14 @@ function AddCustomer() {
     } catch (error) {
       console.error('Error uploading images:', error);
       throw error;
+    } finally {
+      setUploadingImages(prev => ({ ...prev, [category]: false }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       // Upload all pending images first
       const uploadedUrls = {};
@@ -178,6 +189,8 @@ function AddCustomer() {
     } catch (error) {
       console.error('Error adding customer:', error);
       alert(error.response?.data?.message || 'Müştəri əlavə edilərkən xəta baş verdi');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -226,12 +239,32 @@ function AddCustomer() {
           borderRadius: 2,
           boxShadow: 'none',
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          position: 'relative',
         }}
       >
+        {isSubmitting && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'rgba(255, 255, 255, 0.8)',
+              zIndex: 1,
+              borderRadius: 2,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             {/* 1. Müştəri Məlumatları */}
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Paper 
                 variant="outlined" 
                 sx={{ 
@@ -253,7 +286,7 @@ function AddCustomer() {
                 </Typography>
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Ad"
@@ -269,7 +302,7 @@ function AddCustomer() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="E-poçt"
@@ -286,7 +319,7 @@ function AddCustomer() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Telefon"
@@ -302,7 +335,7 @@ function AddCustomer() {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Ünvan"
@@ -490,39 +523,64 @@ function AddCustomer() {
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Yükləmə Tarixi"
-                      name="car.loadingDate"
-                      type="date"
-                      value={formData.car.loadingDate}
-                      onChange={handleChange}
-                      required
-                      InputLabelProps={{ shrink: true }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                        },
-                      }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        label="Yükləmə Tarixi"
+                        value={formData.car.loadingDate ? new Date(formData.car.loadingDate) : null}
+                        onChange={(newValue) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            car: {
+                              ...prev.car,
+                              loadingDate: newValue ? format(newValue, 'yyyy-MM-dd') : '',
+                            },
+                          }));
+                        }}
+                        maxDate={new Date()}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            required: true,
+                            sx: {
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: 2,
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </LocalizationProvider>
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      label="Açılış Tarixi"
-                      name="car.openingDate"
-                      type="date"
-                      value={formData.car.openingDate}
-                      onChange={handleChange}
-                      required
-                      InputLabelProps={{ shrink: true }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                        },
-                      }}
-                    />
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DatePicker
+                        label="Açılış Tarixi"
+                        value={formData.car.openingDate ? new Date(formData.car.openingDate) : null}
+                        onChange={(newValue) => {
+                          setFormData(prev => ({
+                            ...prev,
+                            car: {
+                              ...prev.car,
+                              openingDate: newValue ? format(newValue, 'yyyy-MM-dd') : '',
+                            },
+                          }));
+                        }}
+                        minDate={formData.car.loadingDate ? new Date(formData.car.loadingDate) : new Date()}
+                        maxDate={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            required: true,
+                            sx: {
+                              '& .MuiOutlinedInput-root': {
+                                borderRadius: 2,
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </LocalizationProvider>
                   </Grid>
 
                   <Grid item xs={12} md={6}>
@@ -591,8 +649,28 @@ function AddCustomer() {
                           p: 2,
                           borderRadius: 2,
                           borderColor: alpha(theme.palette.divider, 0.1),
+                          position: 'relative',
                         }}
                       >
+                        {uploadingImages[category.key] && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: 'rgba(255, 255, 255, 0.8)',
+                              zIndex: 1,
+                              borderRadius: 2,
+                            }}
+                          >
+                            <CircularProgress size={24} />
+                          </Box>
+                        )}
                         <Typography 
                           variant="subtitle1" 
                           sx={{ 
@@ -781,6 +859,7 @@ function AddCustomer() {
                 <Button
                   variant="outlined"
                   onClick={() => navigate('/customers')}
+                  disabled={isSubmitting}
                   sx={{
                     borderRadius: 2,
                     textTransform: 'none',
@@ -799,6 +878,7 @@ function AddCustomer() {
                 <Button 
                   type="submit" 
                   variant="contained"
+                  disabled={isSubmitting}
                   sx={{
                     borderRadius: 2,
                     textTransform: 'none',
@@ -811,7 +891,14 @@ function AddCustomer() {
                     },
                   }}
                 >
-                  Yadda Saxla
+                  {isSubmitting ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CircularProgress size={20} color="inherit" />
+                      Yüklənir...
+                    </Box>
+                  ) : (
+                    'Yadda Saxla'
+                  )}
                 </Button>
               </Box>
             </Grid>

@@ -38,6 +38,7 @@ function Customers() {
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -112,11 +113,14 @@ function Customers() {
     }
 
     try {
+      setDeletingId(id);
       await axios.delete(API_ENDPOINTS.CUSTOMERS.DELETE(id));
       setCustomers(customers.filter(customer => customer._id !== id));
     } catch (error) {
       console.error('Error deleting customer:', error);
       setError('Müştəri silinərkən xəta baş verdi');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -212,42 +216,59 @@ function Customers() {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={
-                        customer.car?.status === 'in_transit'
-                          ? 'Yolda'
-                          : customer.car?.status === 'arrived'
-                          ? 'Çatıb'
-                          : customer.car?.status === 'sold'
-                          ? 'Satılıb'
-                          : 'Gözləyir'
-                      }
-                      color={
-                        customer.car?.status === 'in_transit'
-                          ? 'info'
-                          : customer.car?.status === 'arrived'
-                          ? 'success'
-                          : customer.car?.status === 'sold'
-                          ? 'warning'
-                          : 'default'
-                      }
+                      label={getStatusText(customer.car?.status)}
+                      color={getStatusColor(customer.car?.status)}
                       size="small"
+                      sx={{
+                        borderRadius: 1,
+                        fontWeight: 500,
+                      }}
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <IconButton
-                      size="small"
-                      onClick={() => navigate(`/edit-customer/${customer._id}`)}
-                      sx={{ mr: 1 }}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => handleDelete(customer._id)}
-                      color="error"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleViewImages(customer)}
+                        sx={{
+                          color: theme.palette.primary.main,
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                          },
+                        }}
+                      >
+                        <ImageIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate(`/edit-customer/${customer._id}`)}
+                        sx={{
+                          color: theme.palette.info.main,
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.info.main, 0.1),
+                          },
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDelete(customer._id)}
+                        disabled={deletingId === customer._id}
+                        sx={{
+                          color: theme.palette.error.main,
+                          '&:hover': {
+                            bgcolor: alpha(theme.palette.error.main, 0.1),
+                          },
+                        }}
+                      >
+                        {deletingId === customer._id ? (
+                          <CircularProgress size={20} color="inherit" />
+                        ) : (
+                          <DeleteIcon />
+                        )}
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}

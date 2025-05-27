@@ -12,7 +12,9 @@ const API_ENDPOINTS = {
     CREATE: `${API_BASE_URL}/customers`,
     UPDATE: (id) => `${API_BASE_URL}/customers/${id}`,
     DELETE: (id) => `${API_BASE_URL}/customers/${id}`,
-    UPLOAD_PHOTOS: `${API_BASE_URL}/customers/upload-photos`,
+  },
+  UPLOAD: {
+    IMAGE: (category) => `${API_BASE_URL}/upload/${category}`,
   },
 };
 
