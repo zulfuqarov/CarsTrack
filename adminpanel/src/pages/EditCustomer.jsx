@@ -119,6 +119,7 @@ function EditCustomer() {
       }));
     } catch (error) {
       console.error('Error uploading images:', error);
+      alert(error.response?.data?.message || 'Şəkil yükləmə zamanı xəta baş verdi');
     }
   };
 
