@@ -25,10 +25,16 @@ const generateCustomerId = async (name, carMake) => {
 router.get('/', async (req, res) => {
   try {
     const customers = await Customer.find().sort({ createdAt: -1 });
-    res.json(customers);
+    res.json({
+      success: true,
+      data: customers
+    });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
   }
 });
 
@@ -49,7 +55,10 @@ router.post('/', async (req, res) => {
     // Check if customer already exists
     let customer = await Customer.findOne({ email });
     if (customer) {
-      return res.status(400).json({ msg: 'Customer already exists' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Bu email artıq istifadə olunub' 
+      });
     }
 
     // Generate unique customer ID
@@ -66,10 +75,16 @@ router.post('/', async (req, res) => {
     });
 
     await customer.save();
-    res.json(customer);
+    res.status(201).json({
+      success: true,
+      data: customer
+    });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
   }
 });
 
@@ -80,15 +95,27 @@ router.get('/:id', async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
     if (!customer) {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
-    res.json(customer);
+    res.json({
+      success: true,
+      data: customer
+    });
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
-    res.status(500).send('Server Error');
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
   }
 });
 
@@ -117,7 +144,10 @@ router.put('/:id', async (req, res) => {
 
     let customer = await Customer.findById(req.params.id);
     if (!customer) {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
 
     customer = await Customer.findByIdAndUpdate(
@@ -126,13 +156,22 @@ router.put('/:id', async (req, res) => {
       { new: true }
     );
 
-    res.json(customer);
+    res.json({
+      success: true,
+      data: customer
+    });
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
-    res.status(500).send('Server Error');
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
   }
 });
 
@@ -143,17 +182,29 @@ router.delete('/:id', async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
     if (!customer) {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
 
     await customer.deleteOne();
-    res.json({ msg: 'Customer removed' });
+    res.json({ 
+      success: true,
+      message: 'Müştəri silindi' 
+    });
   } catch (err) {
     console.error(err.message);
     if (err.kind === 'ObjectId') {
-      return res.status(404).json({ msg: 'Customer not found' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
     }
-    res.status(500).send('Server Error');
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
   }
 });
 

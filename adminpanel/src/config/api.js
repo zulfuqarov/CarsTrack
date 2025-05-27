@@ -7,7 +7,7 @@ const API_ENDPOINTS = {
     GET_ME: `${API_BASE_URL}/auth/me`,
   },
   CUSTOMERS: {
-    GET_ALL: `${API_BASE_URL}/customers`,
+    LIST: `${API_BASE_URL}/customers`,
     GET_ONE: (id) => `${API_BASE_URL}/customers/${id}`,
     CREATE: `${API_BASE_URL}/customers`,
     UPDATE: (id) => `${API_BASE_URL}/customers/${id}`,

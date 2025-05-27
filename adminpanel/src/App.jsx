@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Customers from './pages/Customers';
 import AddCustomer from './pages/AddCustomer';
 import EditCustomer from './pages/EditCustomer';
 import Layout from './components/Layout';
@@ -44,6 +45,7 @@ function App() {
             >
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
+              <Route path="customers" element={<Customers />} />
               <Route path="add-customer" element={<AddCustomer />} />
               <Route path="edit-customer/:id" element={<EditCustomer />} />
             </Route>

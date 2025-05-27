@@ -18,11 +18,14 @@ import {
   useTheme,
   alpha,
   Chip,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { 
   Edit as EditIcon, 
   Image as ImageIcon,
   Add as AddIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
 import API_ENDPOINTS from '../config/api';
@@ -33,6 +36,8 @@ function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [openImageDialog, setOpenImageDialog] = useState(false);
   const theme = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchCustomers();
@@ -40,10 +45,15 @@ function Customers() {
 
   const fetchCustomers = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await axios.get(API_ENDPOINTS.CUSTOMERS.LIST);
-      setCustomers(response.data);
+      setCustomers(response.data.data || []);
     } catch (error) {
       console.error('Error fetching customers:', error);
+      setError('Müştərilər yüklənərkən xəta baş verdi');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,6 +106,28 @@ function Customers() {
     { key: 'bakuCustoms', label: 'Bakı Gömrük Terminal Şəkilləri' },
   ];
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bu müştərini silmək istədiyinizə əminsiniz?')) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_ENDPOINTS.CUSTOMERS.DELETE}/${id}`);
+      setCustomers(customers.filter(customer => customer._id !== id));
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      setError('Müştəri silinərkən xəta baş verdi');
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Box 
@@ -119,7 +151,7 @@ function Customers() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => navigate('/customers/add')}
+          onClick={() => navigate('/add-customer')}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -136,6 +168,20 @@ function Customers() {
         </Button>
       </Box>
 
+      {error && (
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 3,
+            '& .MuiAlert-message': {
+              fontSize: '0.875rem',
+            },
+          }}
+        >
+          {error}
+        </Alert>
+      )}
+
       <Paper
         sx={{
           borderRadius: 2,
@@ -147,70 +193,61 @@ function Customers() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Müştəri ID</TableCell>
                 <TableCell>Ad</TableCell>
-                <TableCell>E-poçt</TableCell>
+                <TableCell>Email</TableCell>
                 <TableCell>Telefon</TableCell>
                 <TableCell>Maşın</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Əməliyyatlar</TableCell>
+                <TableCell align="right">Əməliyyatlar</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {customers.map((customer) => (
                 <TableRow key={customer._id}>
-                  <TableCell>{customer.customerId}</TableCell>
                   <TableCell>{customer.name}</TableCell>
                   <TableCell>{customer.email}</TableCell>
                   <TableCell>{customer.phone}</TableCell>
                   <TableCell>
-                    {customer.car.year} {customer.car.make} {customer.car.model}
+                    {customer.car?.year} {customer.car?.make} {customer.car?.model}
                   </TableCell>
                   <TableCell>
                     <Chip
                       label={
-                        customer.car.status === 'pending'
-                          ? 'Gözləyir'
-                          : customer.car.status === 'in_transit'
-                          ? 'Yoldadır'
-                          : customer.car.status === 'arrived'
+                        customer.car?.status === 'in_transit'
+                          ? 'Yolda'
+                          : customer.car?.status === 'arrived'
                           ? 'Çatıb'
-                          : 'Satılıb'
+                          : customer.car?.status === 'sold'
+                          ? 'Satılıb'
+                          : 'Gözləyir'
                       }
                       color={
-                        customer.car.status === 'pending'
-                          ? 'default'
-                          : customer.car.status === 'in_transit'
+                        customer.car?.status === 'in_transit'
                           ? 'info'
-                          : customer.car.status === 'arrived'
+                          : customer.car?.status === 'arrived'
                           ? 'success'
-                          : 'warning'
+                          : customer.car?.status === 'sold'
+                          ? 'warning'
+                          : 'default'
                       }
                       size="small"
-                      sx={{
-                        borderRadius: 1,
-                        fontWeight: 500,
-                      }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
+                  <TableCell align="right">
+                    <IconButton
                       size="small"
-                      onClick={() => navigate(`/customers/edit/${customer._id}`)}
-                      sx={{
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        borderColor: alpha(theme.palette.primary.main, 0.5),
-                        color: theme.palette.primary.main,
-                        '&:hover': {
-                          borderColor: theme.palette.primary.main,
-                          bgcolor: alpha(theme.palette.primary.main, 0.05),
-                        },
-                      }}
+                      onClick={() => navigate(`/edit-customer/${customer._id}`)}
+                      sx={{ mr: 1 }}
                     >
-                      Redaktə Et
-                    </Button>
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDelete(customer._id)}
+                      color="error"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}

@@ -8,6 +8,7 @@ import {
   Paper,
   Container,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
@@ -22,23 +23,34 @@ function Login() {
     password: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    const result = await login(formData.email, formData.password);
-    if (result.success) {
-      navigate('/dashboard');
-    } else {
-      setError(result.message);
+    try {
+      const result = await login(formData.email, formData.password);
+      if (result.success) {
+        navigate('/dashboard');
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Giriş zamanı gözlənilməz xəta baş verdi');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,7 +86,15 @@ function Login() {
           </Typography>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3,
+                '& .MuiAlert-message': {
+                  fontSize: '0.875rem',
+                },
+              }}
+            >
               {error}
             </Alert>
           )}
@@ -88,6 +108,8 @@ function Login() {
               value={formData.email}
               onChange={handleChange}
               required
+              disabled={loading}
+              error={!!error}
               sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -104,6 +126,8 @@ function Login() {
               value={formData.password}
               onChange={handleChange}
               required
+              disabled={loading}
+              error={!!error}
               sx={{
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
@@ -116,6 +140,7 @@ function Login() {
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading}
               sx={{
                 py: 1.5,
                 borderRadius: 2,
@@ -126,9 +151,16 @@ function Login() {
                   boxShadow: 'none',
                   bgcolor: alpha(theme.palette.primary.main, 0.9),
                 },
+                '&.Mui-disabled': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.5),
+                },
               }}
             >
-              Daxil Ol
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Daxil Ol'
+              )}
             </Button>
           </form>
         </Paper>
