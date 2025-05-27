@@ -21,6 +21,7 @@ import API_ENDPOINTS from '../config/api';
 function EditCustomer() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -51,7 +52,6 @@ function EditCustomer() {
     },
   });
 
-  const theme = useTheme();
   const [selectedImage, setSelectedImage] = useState(null);
   const [pendingImages, setPendingImages] = useState({
     auction: [],
@@ -69,7 +69,17 @@ function EditCustomer() {
   const fetchCustomer = async () => {
     try {
       const response = await axios.get(API_ENDPOINTS.CUSTOMERS.GET(id));
-      setFormData(response.data);
+      const customerData = response.data;
+      
+      // Format dates to YYYY-MM-DD
+      if (customerData.car.loadingDate) {
+        customerData.car.loadingDate = new Date(customerData.car.loadingDate).toISOString().split('T')[0];
+      }
+      if (customerData.car.openingDate) {
+        customerData.car.openingDate = new Date(customerData.car.openingDate).toISOString().split('T')[0];
+      }
+      
+      setFormData(customerData);
     } catch (error) {
       console.error('Error fetching customer:', error);
     }
@@ -245,486 +255,552 @@ function EditCustomer() {
       >
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
+            {/* 1. Müştəri Məlumatları */}
             <Grid item xs={12}>
-              <Typography 
-                variant="h6" 
+              <Paper 
+                variant="outlined" 
                 sx={{ 
-                  mb: 2,
-                  fontWeight: 500,
-                  color: theme.palette.text.primary
+                  p: 2,
+                  borderRadius: 2,
+                  borderColor: alpha(theme.palette.divider, 0.1),
+                  bgcolor: alpha(theme.palette.primary.main, 0.02),
                 }}
               >
-                Müştəri Məlumatları
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Ad"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="E-poçt"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Telefon"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Ünvan"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 2, 
-                  mt: 2,
-                  fontWeight: 500,
-                  color: theme.palette.text.primary
-                }}
-              >
-                Maşın Məlumatları
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="İl"
-                name="car.year"
-                type="number"
-                value={formData.car.year}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Marka"
-                name="car.make"
-                value={formData.car.make}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Model"
-                name="car.model"
-                value={formData.car.model}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="VIN"
-                name="car.vin"
-                value={formData.car.vin}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Konteyner Nömrəsi"
-                name="car.containerNumber"
-                value={formData.car.containerNumber}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Yükləmə Limanı"
-                name="car.portOfLoading"
-                value={formData.car.portOfLoading}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Status"
-                name="car.status"
-                select
-                value={formData.car.status}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              >
-                <MenuItem value="pending">Gözləyir</MenuItem>
-                <MenuItem value="in_transit">Yoldadır</MenuItem>
-                <MenuItem value="arrived">Çatıb</MenuItem>
-                <MenuItem value="sold">Satılıb</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Yükləmə Tarixi"
-                name="car.loadingDate"
-                type="date"
-                value={formData.car.loadingDate}
-                onChange={handleChange}
-                required
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Açılış Tarixi"
-                name="car.openingDate"
-                type="date"
-                value={formData.car.openingDate}
-                onChange={handleChange}
-                required
-                InputLabelProps={{ shrink: true }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Daşıyıcı İzləmə Linki"
-                name="trackingLinks.carrier"
-                value={formData.car.trackingLinks.carrier}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Gəmi İzləmə Linki"
-                name="trackingLinks.ship"
-                value={formData.car.trackingLinks.ship}
-                onChange={handleChange}
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 2, 
-                  mt: 2,
-                  fontWeight: 500,
-                  color: theme.palette.text.primary
-                }}
-              >
-                Şəkillər
-              </Typography>
-            </Grid>
-
-            {imageCategories.map((category) => (
-              <Grid item xs={12} key={category.key}>
-                <Paper 
-                  variant="outlined" 
+                <Typography 
+                  variant="h6" 
                   sx={{ 
-                    p: 2,
-                    borderRadius: 2,
-                    borderColor: alpha(theme.palette.divider, 0.1),
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
                   }}
                 >
-                  <Typography 
-                    variant="subtitle1" 
-                    sx={{ 
-                      mb: 2,
-                      fontWeight: 500,
-                      color: theme.palette.text.primary
-                    }}
-                  >
-                    {category.label}
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-                    {formData.images[category.key].map((image, index) => (
-                      <Box
-                        key={`existing-${index}`}
-                        sx={{
-                          position: 'relative',
-                          width: 150,
-                          height: 150,
-                          borderRadius: 2,
-                          overflow: 'hidden',
-                          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
-                          border: `2px solid ${theme.palette.primary.main}`,
-                        }}
-                      >
-                        <img
-                          src={image}
-                          alt={`${category.label} ${index + 1}`}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            p: 1,
-                            background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
-                          }}
-                        >
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={() => handleImageClick(image)}
-                            sx={{
-                              minWidth: 'auto',
-                              px: 1,
-                              py: 0.5,
-                              fontSize: '0.75rem',
-                              bgcolor: alpha(theme.palette.common.white, 0.9),
-                              color: theme.palette.text.primary,
-                              '&:hover': {
-                                bgcolor: theme.palette.common.white,
-                              },
-                            }}
-                          >
-                            Bax
-                          </Button>
-                          <IconButton
-                            size="small"
-                            sx={{
-                              bgcolor: alpha(theme.palette.common.white, 0.9),
-                              '&:hover': {
-                                bgcolor: theme.palette.common.white,
-                              },
-                            }}
-                            onClick={() => handleRemoveImage(category.key, index)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    ))}
+                  1. Müştəri Məlumatları
+                </Typography>
 
-                    {pendingImages[category.key].map((image, index) => (
-                      <Box
-                        key={`pending-${index}`}
-                        sx={{
-                          position: 'relative',
-                          width: 150,
-                          height: 150,
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Ad"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
-                          overflow: 'hidden',
-                          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
-                          border: `2px solid ${theme.palette.warning.main}`,
-                        }}
-                      >
-                        <img
-                          src={image.preview}
-                          alt={`Pending ${category.label} ${index + 1}`}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            p: 1,
-                            background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
-                          }}
-                        >
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={() => handleImageClick(image.preview)}
-                            sx={{
-                              minWidth: 'auto',
-                              px: 1,
-                              py: 0.5,
-                              fontSize: '0.75rem',
-                              bgcolor: alpha(theme.palette.common.white, 0.9),
-                              color: theme.palette.text.primary,
-                              '&:hover': {
-                                bgcolor: theme.palette.common.white,
-                              },
-                            }}
-                          >
-                            Bax
-                          </Button>
-                          <IconButton
-                            size="small"
-                            sx={{
-                              bgcolor: alpha(theme.palette.common.white, 0.9),
-                              '&:hover': {
-                                bgcolor: theme.palette.common.white,
-                              },
-                            }}
-                            onClick={() => handleRemoveImage(category.key, index, true)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-
-                  <Button
-                    variant="outlined"
-                    component="label"
-                    startIcon={<AddIcon />}
-                    sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      borderColor: alpha(theme.palette.primary.main, 0.5),
-                      color: theme.palette.primary.main,
-                      '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        bgcolor: alpha(theme.palette.primary.main, 0.05),
-                      },
-                    }}
-                  >
-                    Şəkil Əlavə Et
-                    <input
-                      type="file"
-                      hidden
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, category.key)}
+                        },
+                      }}
                     />
-                  </Button>
-                </Paper>
-              </Grid>
-            ))}
+                  </Grid>
 
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="E-poçt"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Telefon"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Ünvan"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+
+            {/* 2. Maşın Əsas Məlumatları */}
+            <Grid item xs={12}>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  p: 2,
+                  borderRadius: 2,
+                  borderColor: alpha(theme.palette.divider, 0.1),
+                  bgcolor: alpha(theme.palette.info.main, 0.02),
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
+                  }}
+                >
+                  2. Maşın Əsas Məlumatları
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label="İl"
+                      name="car.year"
+                      type="number"
+                      value={formData.car.year}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label="Marka"
+                      name="car.make"
+                      value={formData.car.make}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
+                    <TextField
+                      fullWidth
+                      label="Model"
+                      name="car.model"
+                      value={formData.car.model}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="VIN"
+                      name="car.vin"
+                      value={formData.car.vin}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Status"
+                      name="car.status"
+                      select
+                      value={formData.car.status}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    >
+                      <MenuItem value="pending">Gözləyir</MenuItem>
+                      <MenuItem value="in_transit">Yoldadır</MenuItem>
+                      <MenuItem value="arrived">Çatıb</MenuItem>
+                      <MenuItem value="sold">Satılıb</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+
+            {/* 3. Daşıma Məlumatları */}
+            <Grid item xs={12}>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  p: 2,
+                  borderRadius: 2,
+                  borderColor: alpha(theme.palette.divider, 0.1),
+                  bgcolor: alpha(theme.palette.success.main, 0.02),
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
+                  }}
+                >
+                  3. Daşıma Məlumatları
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Konteyner Nömrəsi"
+                      name="car.containerNumber"
+                      value={formData.car.containerNumber}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Yükləmə Limanı"
+                      name="car.portOfLoading"
+                      value={formData.car.portOfLoading}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Yükləmə Tarixi"
+                      name="car.loadingDate"
+                      type="date"
+                      value={formData.car.loadingDate}
+                      onChange={handleChange}
+                      required
+                      InputLabelProps={{ shrink: true }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Açılış Tarixi"
+                      name="car.openingDate"
+                      type="date"
+                      value={formData.car.openingDate}
+                      onChange={handleChange}
+                      required
+                      InputLabelProps={{ shrink: true }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Daşıyıcı İzləmə Linki"
+                      name="trackingLinks.carrier"
+                      value={formData.car.trackingLinks.carrier}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Gəmi İzləmə Linki"
+                      name="trackingLinks.ship"
+                      value={formData.car.trackingLinks.ship}
+                      onChange={handleChange}
+                      required
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        },
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Paper>
+            </Grid>
+
+            {/* 4. Şəkillər */}
+            <Grid item xs={12}>
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  p: 2,
+                  borderRadius: 2,
+                  borderColor: alpha(theme.palette.divider, 0.1),
+                  bgcolor: alpha(theme.palette.warning.main, 0.02),
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
+                  }}
+                >
+                  4. Şəkillər
+                </Typography>
+
+                <Grid container spacing={2}>
+                  {imageCategories.map((category) => (
+                    <Grid item xs={12} key={category.key}>
+                      <Paper 
+                        variant="outlined" 
+                        sx={{ 
+                          p: 2,
+                          borderRadius: 2,
+                          borderColor: alpha(theme.palette.divider, 0.1),
+                        }}
+                      >
+                        <Typography 
+                          variant="subtitle1" 
+                          sx={{ 
+                            mb: 2,
+                            fontWeight: 500,
+                            color: theme.palette.text.primary
+                          }}
+                        >
+                          {category.label}
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                          {/* Existing images */}
+                          {formData.images[category.key].map((image, index) => (
+                            <Box
+                              key={`existing-${index}`}
+                              sx={{
+                                position: 'relative',
+                                width: 150,
+                                height: 150,
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
+                                border: `2px solid ${theme.palette.primary.main}`,
+                              }}
+                            >
+                              <img
+                                src={image}
+                                alt={`${category.label} ${index + 1}`}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  p: 1,
+                                  background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
+                                }}
+                              >
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  onClick={() => handleImageClick(image)}
+                                  sx={{
+                                    minWidth: 'auto',
+                                    px: 1,
+                                    py: 0.5,
+                                    fontSize: '0.75rem',
+                                    bgcolor: alpha(theme.palette.common.white, 0.9),
+                                    color: theme.palette.text.primary,
+                                    '&:hover': {
+                                      bgcolor: theme.palette.common.white,
+                                    },
+                                  }}
+                                >
+                                  Bax
+                                </Button>
+                                <IconButton
+                                  size="small"
+                                  sx={{
+                                    bgcolor: alpha(theme.palette.common.white, 0.9),
+                                    '&:hover': {
+                                      bgcolor: theme.palette.common.white,
+                                    },
+                                  }}
+                                  onClick={() => handleRemoveImage(category.key, index)}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </Box>
+                          ))}
+
+                          {/* Pending images */}
+                          {pendingImages[category.key].map((image, index) => (
+                            <Box
+                              key={`pending-${index}`}
+                              sx={{
+                                position: 'relative',
+                                width: 150,
+                                height: 150,
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
+                                border: `2px solid ${theme.palette.warning.main}`,
+                              }}
+                            >
+                              <img
+                                src={image.preview}
+                                alt={`Pending ${category.label} ${index + 1}`}
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover',
+                                }}
+                              />
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  p: 1,
+                                  background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
+                                }}
+                              >
+                                <Button
+                                  size="small"
+                                  variant="contained"
+                                  onClick={() => handleImageClick(image.preview)}
+                                  sx={{
+                                    minWidth: 'auto',
+                                    px: 1,
+                                    py: 0.5,
+                                    fontSize: '0.75rem',
+                                    bgcolor: alpha(theme.palette.common.white, 0.9),
+                                    color: theme.palette.text.primary,
+                                    '&:hover': {
+                                      bgcolor: theme.palette.common.white,
+                                    },
+                                  }}
+                                >
+                                  Bax
+                                </Button>
+                                <IconButton
+                                  size="small"
+                                  sx={{
+                                    bgcolor: alpha(theme.palette.common.white, 0.9),
+                                    '&:hover': {
+                                      bgcolor: theme.palette.common.white,
+                                    },
+                                  }}
+                                  onClick={() => handleRemoveImage(category.key, index, true)}
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
+
+                        <Button
+                          variant="outlined"
+                          component="label"
+                          startIcon={<AddIcon />}
+                          sx={{
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            borderColor: alpha(theme.palette.primary.main, 0.5),
+                            color: theme.palette.primary.main,
+                            '&:hover': {
+                              borderColor: theme.palette.primary.main,
+                              bgcolor: alpha(theme.palette.primary.main, 0.05),
+                            },
+                          }}
+                        >
+                          Şəkil Əlavə Et
+                          <input
+                            type="file"
+                            hidden
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, category.key)}
+                          />
+                        </Button>
+                      </Paper>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Paper>
+            </Grid>
+
+            {/* 5. Form Buttons */}
             <Grid item xs={12}>
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                 <Button

@@ -35,10 +35,10 @@ function Dashboard() {
   const fetchData = async () => {
     try {
       const response = await axios.get(API_ENDPOINTS.CUSTOMERS.LIST);
-      const customers = response.data;
+      const customers = response.data.data || []; // Ensure we have an array
 
       // Calculate statistics
-      const stats = {
+      const newStats = {
         totalCustomers: customers.length,
         inTransit: customers.filter(c => c.car?.status === 'in_transit').length,
         arrived: customers.filter(c => c.car?.status === 'arrived').length,
@@ -46,7 +46,7 @@ function Dashboard() {
         recentCustomers: customers.slice(0, 5), // Get 5 most recent customers
       };
 
-      setStats(stats);
+      setStats(newStats);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -66,7 +66,7 @@ function Dashboard() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Paper
             sx={{
               p: 3,
@@ -98,7 +98,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Paper
             sx={{
               p: 3,
@@ -130,7 +130,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Paper
             sx={{
               p: 3,
@@ -162,7 +162,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid xs={12} sm={6} md={3}>
           <Paper
             sx={{
               p: 3,
@@ -194,7 +194,7 @@ function Dashboard() {
           </Paper>
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid xs={12}>
           <Paper
             sx={{
               p: 3,
@@ -211,57 +211,57 @@ function Dashboard() {
                 color: theme.palette.text.primary
               }}
             >
-              Son Əlavə Olunan Müştərilər
+              Son Əlavə Edilən Müştərilər
             </Typography>
 
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Müştəri ID</TableCell>
-                  <TableCell>Ad</TableCell>
-                  <TableCell>Maşın</TableCell>
-                  <TableCell>Status</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {stats.recentCustomers.map((customer) => (
-                  <TableRow key={customer._id}>
-                    <TableCell>{customer.customerId}</TableCell>
-                    <TableCell>{customer.name}</TableCell>
-                    <TableCell>
-                      {customer.car.year} {customer.car.make} {customer.car.model}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={
-                          customer.car.status === 'pending'
-                            ? 'Gözləyir'
-                            : customer.car.status === 'in_transit'
-                            ? 'Yoldadır'
-                            : customer.car.status === 'arrived'
-                            ? 'Çatıb'
-                            : 'Satılıb'
-                        }
-                        color={
-                          customer.car.status === 'pending'
-                            ? 'default'
-                            : customer.car.status === 'in_transit'
-                            ? 'info'
-                            : customer.car.status === 'arrived'
-                            ? 'success'
-                            : 'warning'
-                        }
-                        size="small"
-                        sx={{
-                          borderRadius: 1,
-                          fontWeight: 500,
-                        }}
-                      />
-                    </TableCell>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Ad</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Telefon</TableCell>
+                    <TableCell>Maşın</TableCell>
+                    <TableCell>Status</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {stats.recentCustomers.map((customer) => (
+                    <TableRow key={customer._id}>
+                      <TableCell>{customer.name}</TableCell>
+                      <TableCell>{customer.email}</TableCell>
+                      <TableCell>{customer.phone}</TableCell>
+                      <TableCell>
+                        {customer.car?.year} {customer.car?.make} {customer.car?.model}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={
+                            customer.car?.status === 'in_transit'
+                              ? 'Yolda'
+                              : customer.car?.status === 'arrived'
+                              ? 'Çatıb'
+                              : customer.car?.status === 'sold'
+                              ? 'Satılıb'
+                              : 'Gözləyir'
+                          }
+                          color={
+                            customer.car?.status === 'in_transit'
+                              ? 'info'
+                              : customer.car?.status === 'arrived'
+                              ? 'success'
+                              : customer.car?.status === 'sold'
+                              ? 'warning'
+                              : 'default'
+                          }
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Paper>
         </Grid>
       </Grid>

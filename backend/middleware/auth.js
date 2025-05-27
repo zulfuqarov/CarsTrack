@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
 // Protect routes
-exports.protect = asyncHandler(async (req, res, next) => {
+exports.protect = async (req, res, next) => {
   let token;
 
   if (
@@ -18,7 +18,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized to access this route'
+      message: 'Bu səhifəyə giriş üçün avtorizasiya tələb olunur',
     });
   }
 
@@ -32,10 +32,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
   } catch (err) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized to access this route'
+      message: 'Bu səhifəyə giriş üçün avtorizasiya tələb olunur',
     });
   }
-});
+};
 
 // Grant access to specific roles
 exports.authorize = (...roles) => {

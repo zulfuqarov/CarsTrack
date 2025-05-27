@@ -4,6 +4,8 @@ const cors = require('cors');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 const connectDB = require('./config/db');
+const authRoutes = require('./routes/auth');
+const customerRoutes = require('./routes/customers');
 
 // Load env vars
 dotenv.config();
@@ -15,6 +17,7 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Enable CORS
 app.use(cors());
@@ -27,20 +30,21 @@ app.use(fileUpload({
   abortOnLimit: true,
   responseOnLimit: 'Fayl ölçüsü 5MB-dan çox ola bilməz',
   createParentPath: true,
-  debug: true,
+  debug: false,
   safeFileNames: true,
   preserveExtension: true,
   parseNested: true,
-  uriDecodeFileNames: true
+  uriDecodeFileNames: true,
+  useTempFiles: true,
+  tempFileDir: path.join(__dirname, 'tmp')
 }));
 
 // Set static folder
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/cars', require('./routes/cars'));
-app.use('/api/customers', require('./routes/customers'));
+app.use('/api/auth', authRoutes);
+app.use('/api/customers', customerRoutes);
 app.use('/api/upload', require('./routes/upload'));
 
 const PORT = process.env.PORT || 5000;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -16,44 +16,56 @@ import {
   useTheme,
   alpha,
   Divider,
+  Avatar,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
   People as PeopleIcon,
+  PersonAdd as PersonAddIcon,
+  Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-const drawerWidth = 280;
+const drawerWidth = 240;
 
-function Layout({ children }) {
+function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const theme = useTheme();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Müştərilər', icon: <PeopleIcon />, path: '/customers' },
   ];
 
   const drawer = (
-    <>
+    <div>
       <Toolbar>
-        <Typography 
-          variant="h6" 
-          noWrap 
-          component="div"
-          sx={{
-            fontWeight: 600,
-            color: theme.palette.text.primary,
-          }}
-        >
-          Car Track
+        <Typography variant="h6" noWrap component="div">
+          Admin Panel
         </Typography>
       </Toolbar>
       <Divider />
@@ -63,7 +75,6 @@ function Layout({ children }) {
             <ListItemButton
               component={Link}
               to={item.path}
-              selected={location.pathname === item.path}
               sx={{
                 borderRadius: 1,
                 mx: 1,
@@ -82,7 +93,7 @@ function Layout({ children }) {
             >
               <ListItemIcon
                 sx={{
-                  color: location.pathname === item.path
+                  color: item.path === '/dashboard'
                     ? theme.palette.primary.main
                     : theme.palette.text.secondary,
                 }}
@@ -92,14 +103,22 @@ function Layout({ children }) {
               <ListItemText 
                 primary={item.text}
                 primaryTypographyProps={{
-                  fontWeight: location.pathname === item.path ? 600 : 400,
+                  fontWeight: item.path === '/dashboard' ? 600 : 400,
                 }}
               />
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => navigate('/add-customer')}>
+            <ListItemIcon>
+              <PersonAddIcon />
+            </ListItemIcon>
+            <ListItemText primary="Müştəri Əlavə Et" />
+          </ListItemButton>
+        </ListItem>
       </List>
-    </>
+    </div>
   );
 
   return (
@@ -113,7 +132,8 @@ function Layout({ children }) {
           bgcolor: 'background.paper',
           color: 'text.primary',
           boxShadow: 'none',
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
         }}
       >
         <Toolbar>
@@ -126,17 +146,41 @@ function Layout({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography 
-            variant="h6" 
-            noWrap 
-            component="div"
-            sx={{
-              fontWeight: 600,
-              color: theme.palette.text.primary,
-            }}
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleMenu}
+            color="inherit"
           >
-            Car Track Admin Panel
-          </Typography>
+            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+              {user?.name?.charAt(0)}
+            </Avatar>
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Çıxış</ListItemText>
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Box
@@ -155,8 +199,6 @@ function Layout({ children }) {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: 'background.paper',
-              borderRight: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             },
           }}
         >
@@ -169,8 +211,6 @@ function Layout({ children }) {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: 'background.paper',
-              borderRight: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             },
           }}
           open
@@ -184,11 +224,12 @@ function Layout({ children }) {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
           bgcolor: 'background.default',
         }}
       >
         <Toolbar />
-        {children}
+        <Outlet />
       </Box>
     </Box>
   );
