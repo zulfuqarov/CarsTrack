@@ -53,6 +53,14 @@ function EditCustomer() {
 
   const theme = useTheme();
   const [selectedImage, setSelectedImage] = useState(null);
+  const [pendingImages, setPendingImages] = useState({
+    auction: [],
+    americanDepot: [],
+    containerLoading: [],
+    containerUnloading: [],
+    bakuRoad: [],
+    bakuCustoms: [],
+  });
 
   useEffect(() => {
     fetchCustomer();
@@ -100,49 +108,91 @@ function EditCustomer() {
 
   const handleImageUpload = async (e, category) => {
     const files = Array.from(e.target.files);
-    const formData = new FormData();
     
-    files.forEach(file => {
-      formData.append('images', file);
+    // Create temporary URLs for preview
+    const newImages = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+
+    setPendingImages(prev => ({
+      ...prev,
+      [category]: [...prev[category], ...newImages]
+    }));
+  };
+
+  const handleRemoveImage = (category, index, isPending = false) => {
+    if (isPending) {
+      setPendingImages(prev => ({
+        ...prev,
+        [category]: prev[category].filter((_, i) => i !== index)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        images: {
+          ...prev.images,
+          [category]: prev.images[category].filter((_, i) => i !== index),
+        },
+      }));
+    }
+  };
+
+  const uploadImagesToCloudinary = async (images, category) => {
+    const formData = new FormData();
+    images.forEach(({ file }) => {
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+      const newFile = new File([file], cleanFileName, { type: file.type });
+      formData.append('images', newFile);
     });
 
     try {
       const response = await axios.post(API_ENDPOINTS.UPLOAD.IMAGE(category), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-        },
+        }
       });
 
-      setFormData(prev => ({
-        ...prev,
-        images: {
-          ...prev.images,
-          [category]: [...prev.images[category], ...response.data.urls],
-        },
-      }));
+      if (response.data.urls && response.data.urls.length > 0) {
+        return response.data.urls;
+      } else {
+        throw new Error('No URLs returned from server');
+      }
     } catch (error) {
       console.error('Error uploading images:', error);
-      alert(error.response?.data?.message || 'Şəkil yükləmə zamanı xəta baş verdi');
+      throw error;
     }
-  };
-
-  const handleRemoveImage = (category, index) => {
-    setFormData(prev => ({
-      ...prev,
-      images: {
-        ...prev.images,
-        [category]: prev.images[category].filter((_, i) => i !== index),
-      },
-    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(API_ENDPOINTS.CUSTOMERS.UPDATE(id), formData);
+      // Upload all pending images first
+      const uploadedUrls = {};
+      for (const category of Object.keys(pendingImages)) {
+        if (pendingImages[category].length > 0) {
+          const urls = await uploadImagesToCloudinary(pendingImages[category], category);
+          uploadedUrls[category] = urls;
+        }
+      }
+
+      // Combine existing and new images
+      const finalFormData = {
+        ...formData,
+        images: {
+          ...formData.images,
+          ...Object.keys(uploadedUrls).reduce((acc, category) => ({
+            ...acc,
+            [category]: [...formData.images[category], ...uploadedUrls[category]]
+          }), {})
+        }
+      };
+
+      await axios.put(API_ENDPOINTS.CUSTOMERS.UPDATE(id), finalFormData);
       navigate('/customers');
     } catch (error) {
       console.error('Error updating customer:', error);
+      alert(error.response?.data?.message || 'Müştəri məlumatları yenilənərkən xəta baş verdi');
     }
   };
 
@@ -162,6 +212,15 @@ function EditCustomer() {
     { key: 'bakuRoad', label: 'Bakı Yol Şəkilləri' },
     { key: 'bakuCustoms', label: 'Bakı Gömrük Terminal Şəkilləri' },
   ];
+
+  // Clean up object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      Object.values(pendingImages).forEach(images => {
+        images.forEach(image => URL.revokeObjectURL(image.preview));
+      });
+    };
+  }, []);
 
   return (
     <Box>
@@ -503,7 +562,7 @@ function EditCustomer() {
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                     {formData.images[category.key].map((image, index) => (
                       <Box
-                        key={index}
+                        key={`existing-${index}`}
                         sx={{
                           position: 'relative',
                           width: 150,
@@ -562,6 +621,74 @@ function EditCustomer() {
                               },
                             }}
                             onClick={() => handleRemoveImage(category.key, index)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    ))}
+
+                    {pendingImages[category.key].map((image, index) => (
+                      <Box
+                        key={`pending-${index}`}
+                        sx={{
+                          position: 'relative',
+                          width: 150,
+                          height: 150,
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
+                          border: `2px solid ${theme.palette.warning.main}`,
+                        }}
+                      >
+                        <img
+                          src={image.preview}
+                          alt={`Pending ${category.label} ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            p: 1,
+                            background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.7)}, transparent)`,
+                          }}
+                        >
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => handleImageClick(image.preview)}
+                            sx={{
+                              minWidth: 'auto',
+                              px: 1,
+                              py: 0.5,
+                              fontSize: '0.75rem',
+                              bgcolor: alpha(theme.palette.common.white, 0.9),
+                              color: theme.palette.text.primary,
+                              '&:hover': {
+                                bgcolor: theme.palette.common.white,
+                              },
+                            }}
+                          >
+                            Bax
+                          </Button>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              bgcolor: alpha(theme.palette.common.white, 0.9),
+                              '&:hover': {
+                                bgcolor: theme.palette.common.white,
+                              },
+                            }}
+                            onClick={() => handleRemoveImage(category.key, index, true)}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
