@@ -30,7 +30,6 @@ function EditCustomer() {
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState({});
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -200,7 +199,6 @@ function EditCustomer() {
   };
 
   const uploadImagesToCloudinary = async (images, category) => {
-    setUploadingImages(prev => ({ ...prev, [category]: true }));
     const formData = new FormData();
     images.forEach(({ file }) => {
       const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
@@ -223,8 +221,6 @@ function EditCustomer() {
     } catch (error) {
       console.error('Error uploading images:', error);
       throw error;
-    } finally {
-      setUploadingImages(prev => ({ ...prev, [category]: false }));
     }
   };
 
@@ -736,25 +732,6 @@ function EditCustomer() {
                         position: 'relative',
                       }}
                     >
-                      {uploadingImages[category.key] && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: 'rgba(255, 255, 255, 0.8)',
-                            zIndex: 1,
-                            borderRadius: 2,
-                          }}
-                        >
-                          <CircularProgress size={24} />
-                        </Box>
-                      )}
                       <Typography 
                         variant="subtitle1" 
                         sx={{ 

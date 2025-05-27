@@ -228,8 +228,7 @@ function Customers() {
                   <TableCell align="right">
                     <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
                       <IconButton
-                        size="small"
-                        onClick={() => handleViewImages(customer)}
+                        onClick={() => navigate(`/customers/edit/${customer._id}`)}
                         sx={{
                           color: theme.palette.primary.main,
                           '&:hover': {
@@ -237,11 +236,10 @@ function Customers() {
                           },
                         }}
                       >
-                        <ImageIcon />
+                        <EditIcon />
                       </IconButton>
                       <IconButton
-                        size="small"
-                        onClick={() => navigate(`/edit-customer/${customer._id}`)}
+                        onClick={() => handleViewImages(customer)}
                         sx={{
                           color: theme.palette.info.main,
                           '&:hover': {
@@ -249,10 +247,9 @@ function Customers() {
                           },
                         }}
                       >
-                        <EditIcon />
+                        <ImageIcon />
                       </IconButton>
                       <IconButton
-                        size="small"
                         onClick={() => handleDelete(customer._id)}
                         disabled={deletingId === customer._id}
                         sx={{
@@ -263,7 +260,7 @@ function Customers() {
                         }}
                       >
                         {deletingId === customer._id ? (
-                          <CircularProgress size={20} color="inherit" />
+                          <CircularProgress size={24} color="error" />
                         ) : (
                           <DeleteIcon />
                         )}
