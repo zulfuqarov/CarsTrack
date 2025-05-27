@@ -12,9 +12,12 @@ import {
 } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
+import { alpha } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 function AddCustomer() {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -134,15 +137,36 @@ function AddCustomer() {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          mb: 3,
+          fontWeight: 600,
+          color: theme.palette.text.primary
+        }}
+      >
         Yeni Müştəri Əlavə Et
       </Typography>
 
-      <Paper sx={{ p: 3 }}>
+      <Paper 
+        sx={{ 
+          p: 3,
+          borderRadius: 2,
+          boxShadow: 'none',
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        }}
+      >
         <form onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant="h6" sx={{ mb: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2,
+                  fontWeight: 500,
+                  color: theme.palette.text.primary
+                }}
+              >
                 Müştəri Məlumatları
               </Typography>
             </Grid>
@@ -155,6 +179,11 @@ function AddCustomer() {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -167,6 +196,11 @@ function AddCustomer() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -178,6 +212,11 @@ function AddCustomer() {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -189,11 +228,24 @@ function AddCustomer() {
                 value={formData.address}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="h6" sx={{ mb: 2, mt: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2, 
+                  mt: 2,
+                  fontWeight: 500,
+                  color: theme.palette.text.primary
+                }}
+              >
                 Maşın Məlumatları
               </Typography>
             </Grid>
@@ -207,6 +259,11 @@ function AddCustomer() {
                 value={formData.car.year}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -218,6 +275,11 @@ function AddCustomer() {
                 value={formData.car.make}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -229,6 +291,11 @@ function AddCustomer() {
                 value={formData.car.model}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -240,6 +307,11 @@ function AddCustomer() {
                 value={formData.car.vin}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -251,6 +323,11 @@ function AddCustomer() {
                 value={formData.car.containerNumber}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -262,6 +339,11 @@ function AddCustomer() {
                 value={formData.car.portOfLoading}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -274,6 +356,11 @@ function AddCustomer() {
                 value={formData.car.status}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               >
                 <MenuItem value="pending">Gözləyir</MenuItem>
                 <MenuItem value="in_transit">Yoldadır</MenuItem>
@@ -292,6 +379,11 @@ function AddCustomer() {
                 onChange={handleChange}
                 required
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -305,6 +397,11 @@ function AddCustomer() {
                 onChange={handleChange}
                 required
                 InputLabelProps={{ shrink: true }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -316,6 +413,11 @@ function AddCustomer() {
                 value={formData.car.trackingLinks.carrier}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
@@ -327,19 +429,46 @@ function AddCustomer() {
                 value={formData.car.trackingLinks.ship}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                  },
+                }}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="h6" sx={{ mb: 2, mt: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2, 
+                  mt: 2,
+                  fontWeight: 500,
+                  color: theme.palette.text.primary
+                }}
+              >
                 Şəkillər
               </Typography>
             </Grid>
 
             {imageCategories.map((category) => (
               <Grid item xs={12} key={category.key}>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                <Paper 
+                  variant="outlined" 
+                  sx={{ 
+                    p: 2,
+                    borderRadius: 2,
+                    borderColor: alpha(theme.palette.divider, 0.1),
+                  }}
+                >
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      mb: 2,
+                      fontWeight: 500,
+                      color: theme.palette.text.primary
+                    }}
+                  >
                     {category.label}
                   </Typography>
                   
@@ -351,6 +480,9 @@ function AddCustomer() {
                           position: 'relative',
                           width: 150,
                           height: 150,
+                          borderRadius: 2,
+                          overflow: 'hidden',
+                          boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.1)}`,
                         }}
                       >
                         <img
@@ -368,9 +500,9 @@ function AddCustomer() {
                             position: 'absolute',
                             top: 4,
                             right: 4,
-                            bgcolor: 'rgba(255, 255, 255, 0.8)',
+                            bgcolor: alpha(theme.palette.common.white, 0.9),
                             '&:hover': {
-                              bgcolor: 'rgba(255, 255, 255, 0.9)',
+                              bgcolor: theme.palette.common.white,
                             },
                           }}
                           onClick={() => handleRemoveImage(category.key, index)}
@@ -385,6 +517,16 @@ function AddCustomer() {
                     variant="outlined"
                     component="label"
                     startIcon={<AddIcon />}
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      borderColor: alpha(theme.palette.primary.main, 0.5),
+                      color: theme.palette.primary.main,
+                      '&:hover': {
+                        borderColor: theme.palette.primary.main,
+                        bgcolor: alpha(theme.palette.primary.main, 0.05),
+                      },
+                    }}
                   >
                     Şəkil Əlavə Et
                     <input
@@ -404,10 +546,36 @@ function AddCustomer() {
                 <Button
                   variant="outlined"
                   onClick={() => navigate('/customers')}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    px: 3,
+                    py: 1,
+                    borderColor: alpha(theme.palette.text.primary, 0.3),
+                    color: theme.palette.text.primary,
+                    '&:hover': {
+                      borderColor: theme.palette.text.primary,
+                      bgcolor: alpha(theme.palette.text.primary, 0.05),
+                    },
+                  }}
                 >
                   Ləğv Et
                 </Button>
-                <Button type="submit" variant="contained">
+                <Button 
+                  type="submit" 
+                  variant="contained"
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    px: 3,
+                    py: 1,
+                    boxShadow: 'none',
+                    '&:hover': {
+                      boxShadow: 'none',
+                      bgcolor: alpha(theme.palette.primary.main, 0.9),
+                    },
+                  }}
+                >
                   Yadda Saxla
                 </Button>
               </Box>
