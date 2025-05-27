@@ -14,6 +14,7 @@ import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
 import { alpha } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
+import API_ENDPOINTS from '../config/api';
 
 function EditCustomer() {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ function EditCustomer() {
 
   const fetchCustomer = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/customers/${id}`);
+      const response = await axios.get(API_ENDPOINTS.CUSTOMERS.GET(id));
       setFormData(response.data);
     } catch (error) {
       console.error('Error fetching customer:', error);
@@ -65,18 +66,9 @@ function EditCustomer() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value,
-        },
-      }));
-    } else if (name.includes('trackingLinks.')) {
+    if (name.includes('trackingLinks.')) {
       const [, linkType] = name.split('.');
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         car: {
           ...prev.car,
@@ -86,8 +78,17 @@ function EditCustomer() {
           },
         },
       }));
+    } else if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value,
+        },
+      }));
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         [name]: value,
       }));
@@ -103,7 +104,7 @@ function EditCustomer() {
     });
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/upload/${category}`, formData, {
+      const response = await axios.post(API_ENDPOINTS.UPLOAD.IMAGE(category), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -134,7 +135,7 @@ function EditCustomer() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/customers/${id}`, formData);
+      await axios.put(API_ENDPOINTS.CUSTOMERS.UPDATE(id), formData);
       navigate('/customers');
     } catch (error) {
       console.error('Error updating customer:', error);

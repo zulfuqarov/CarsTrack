@@ -25,6 +25,7 @@ import {
   Add as AddIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import API_ENDPOINTS from '../config/api';
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -39,7 +40,7 @@ function Customers() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/customers');
+      const response = await axios.get(API_ENDPOINTS.CUSTOMERS.LIST);
       setCustomers(response.data);
     } catch (error) {
       console.error('Error fetching customers:', error);

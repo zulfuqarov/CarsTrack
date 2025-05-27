@@ -14,6 +14,7 @@ import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import axios from 'axios';
 import { alpha } from '@mui/material/styles';
 import { useTheme } from '@mui/material/styles';
+import API_ENDPOINTS from '../config/api';
 
 function AddCustomer() {
   const navigate = useNavigate();
@@ -50,18 +51,9 @@ function AddCustomer() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value,
-        },
-      }));
-    } else if (name.includes('trackingLinks.')) {
+    if (name.includes('trackingLinks.')) {
       const [, linkType] = name.split('.');
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         car: {
           ...prev.car,
@@ -71,8 +63,17 @@ function AddCustomer() {
           },
         },
       }));
+    } else if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value,
+        },
+      }));
     } else {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         [name]: value,
       }));
@@ -88,7 +89,7 @@ function AddCustomer() {
     });
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/upload/${category}`, formData, {
+      const response = await axios.post(API_ENDPOINTS.UPLOAD.IMAGE(category), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -119,7 +120,7 @@ function AddCustomer() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/customers', formData);
+      await axios.post(API_ENDPOINTS.CUSTOMERS.CREATE, formData);
       navigate('/customers');
     } catch (error) {
       console.error('Error adding customer:', error);

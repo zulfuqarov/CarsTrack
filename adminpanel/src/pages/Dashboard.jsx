@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import { useTheme } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
+import API_ENDPOINTS from '../config/api';
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -33,7 +34,7 @@ function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/customers');
+      const response = await axios.get(API_ENDPOINTS.CUSTOMERS.LIST);
       const customers = response.data;
 
       // Calculate statistics
