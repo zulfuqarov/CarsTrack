@@ -112,7 +112,7 @@ function Customers() {
     }
 
     try {
-      await axios.delete(`${API_ENDPOINTS.CUSTOMERS.DELETE}/${id}`);
+      await axios.delete(API_ENDPOINTS.CUSTOMERS.DELETE(id));
       setCustomers(customers.filter(customer => customer._id !== id));
     } catch (error) {
       console.error('Error deleting customer:', error);
