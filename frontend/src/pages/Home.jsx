@@ -1,9 +1,61 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MagnifyingGlassIcon, TruckIcon, MapIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setError('Müştəri ID-ni daxil edin');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('Axtarış başladı:', searchQuery);
+      const response = await axios.get(`http://localhost:2323/api/customers/customerId/${searchQuery}`);
+      console.log('API cavabı:', response.data);
+
+      if (response.data) {
+        // Məlumatları localStorage-də saxlayırıq
+        localStorage.setItem('customerData', JSON.stringify(response.data));
+        console.log('Məlumatlar localStorage-də saxlandı');
+        // Avtomobillər səhifəsinə yönləndiririk
+        navigate('/cars');
+      } else {
+        setError('Müştəri məlumatı tapılmadı');
+      }
+    } catch (err) {
+      console.error('API xətası:', err);
+      if (err.response) {
+        // Server xətası
+        setError(err.response.data.message || 'Müştəri tapılmadı');
+      } else if (err.request) {
+        // Serverə qoşulma xətası
+        setError('Serverə qoşulma xətası. Zəhmət olmasa daha sonra yenidən cəhd edin.');
+      } else {
+        // Digər xətalar
+        setError('Xəta baş verdi. Zəhmət olmasa daha sonra yenidən cəhd edin.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    console.log('Klaviatura düyməsi basıldı:', e.key);
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const features = [
     {
@@ -58,11 +110,32 @@ const Home = () => {
                 className="flex-1 px-4 py-2 text-gray-900 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                // onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onClick={() => {
+                  handleSearch()
+                }}
               />
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                <MagnifyingGlassIcon className="h-6 w-6" />
+              <button
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                onClick={handleSearch}
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                ) : (
+                  <MagnifyingGlassIcon className="h-6 w-6" />
+                )}
               </button>
             </div>
+            {error && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-red-500 mt-2"
+              >
+                {error}
+              </motion.p>
+            )}
           </motion.div>
         </div>
       </section>
