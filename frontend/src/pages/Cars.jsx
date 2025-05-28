@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ImageGallery from 'react-image-gallery';
+import "react-image-gallery/styles/css/image-gallery.css";
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -26,6 +28,8 @@ const Cars = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentCategory, setCurrentCategory] = useState(null);
+  const [galleryImages, setGalleryImages] = useState([]);
 
   const fetchCustomerData = async (customerId) => {
     try {
@@ -87,24 +91,56 @@ const Cars = () => {
   };
 
   const handleImageClick = (category, imageUrl, index) => {
-    setSelectedImage({ category, url: imageUrl });
-    setCurrentImageIndex(index);
+    const images = customerData.images[category] || [];
+    const formattedImages = images.map(url => ({
+      original: url,
+      thumbnail: url,
+    }));
+    setGalleryImages(formattedImages);
+    setCurrentCategory(category);
+    setSelectedImage(true);
   };
 
-  const handleNextImage = () => {
-    if (!customerData.images) return;
-    const allImages = Object.values(customerData.images).flat();
-    const nextIndex = (currentImageIndex + 1) % allImages.length;
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    if (!currentCategory || !customerData.images) {
+      console.log('No category or images available');
+      return;
+    }
+    
+    const images = customerData.images[currentCategory] || [];
+    console.log('Current images:', images);
+    console.log('Current index:', currentImageIndex);
+    
+    const nextIndex = (currentImageIndex + 1) % images.length;
+    console.log('Next index:', nextIndex);
+    
     setCurrentImageIndex(nextIndex);
-    setSelectedImage({ url: allImages[nextIndex] });
+    setSelectedImage(images[nextIndex]);
   };
 
-  const handlePrevImage = () => {
-    if (!customerData.images) return;
-    const allImages = Object.values(customerData.images).flat();
-    const prevIndex = (currentImageIndex - 1 + allImages.length) % allImages.length;
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    if (!currentCategory || !customerData.images) {
+      console.log('No category or images available');
+      return;
+    }
+    
+    const images = customerData.images[currentCategory] || [];
+    console.log('Current images:', images);
+    console.log('Current index:', currentImageIndex);
+    
+    const prevIndex = (currentImageIndex - 1 + images.length) % images.length;
+    console.log('Previous index:', prevIndex);
+    
     setCurrentImageIndex(prevIndex);
-    setSelectedImage({ url: allImages[prevIndex] });
+    setSelectedImage(images[prevIndex]);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+    setCurrentCategory(null);
+    setGalleryImages([]);
   };
 
   const handleClearData = () => {
@@ -258,7 +294,7 @@ const Cars = () => {
                             <div
                               key={index}
                               className="relative aspect-[4/3] group cursor-pointer"
-                              onClick={() => handleImageClick(category, image, index)}
+                              onClick={(e) => handleImageClick(category, image, index)}
                             >
                               <img
                                 src={image}
@@ -337,42 +373,76 @@ const Cars = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
-            onClick={() => setSelectedImage(null)}
+            onClick={closeModal}
           >
-            <div className="relative w-[90%] max-w-3xl mx-4">
+            <div className="relative w-[95%] max-w-6xl mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="absolute -top-16 left-0 text-left">
+                <h3 className="text-xl font-semibold text-white">
+                  {imageCategories[currentCategory]}
+                </h3>
+              </div>
+
               <button
                 className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors duration-200"
-                onClick={() => setSelectedImage(null)}
+                onClick={closeModal}
               >
                 <XMarkIcon className="h-8 w-8" />
               </button>
-              
-              <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors duration-200"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePrevImage();
-                }}
-              >
-                <ChevronLeftIcon className="h-8 w-8" />
-              </button>
-              
-              <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors duration-200"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNextImage();
-                }}
-              >
-                <ChevronRightIcon className="h-8 w-8" />
-              </button>
 
-              <div className="relative aspect-video">
-                <img
-                  src={selectedImage.url}
-                  alt="Selected"
-                  className="w-full h-full object-contain rounded-lg"
-                  onClick={(e) => e.stopPropagation()}
+              <div className="bg-white rounded-lg p-4">
+                <style>
+                  {`
+                    .image-gallery-slide {
+                      background: white;
+                    }
+                    .image-gallery-image {
+                      max-height: 60vh;
+                      object-fit: contain;
+                    }
+                    .image-gallery-thumbnail {
+                      width: 80px;
+                      height: 60px;
+                    }
+                    .image-gallery-thumbnail-image {
+                      object-fit: cover;
+                      height: 100%;
+                    }
+                    .image-gallery-thumbnails-container {
+                      background: white;
+                    }
+                    .image-gallery-thumbnail.active {
+                      border: 2px solid #2563eb;
+                    }
+                    .image-gallery-thumbnail:hover {
+                      border: 2px solid #3b82f6;
+                    }
+                    .image-gallery-icon {
+                      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+                    }
+                    .image-gallery-icon:hover {
+                      color: #2563eb;
+                    }
+                  `}
+                </style>
+                <ImageGallery
+                  items={galleryImages}
+                  showPlayButton={false}
+                  showFullscreenButton={true}
+                  showNav={true}
+                  showThumbnails={true}
+                  thumbnailPosition="bottom"
+                  slideInterval={0}
+                  slideOnThumbnailOver={true}
+                  additionalClass="custom-gallery"
+                  showIndex={true}
+                  showBullets={false}
+                  lazyLoad={true}
+                  useBrowserFullscreen={true}
+                  renderCustomControls={() => (
+                    <div className="absolute bottom-4 right-4 text-sm text-gray-500">
+                      {galleryImages.length} şəkil
+                    </div>
+                  )}
                 />
               </div>
             </div>
