@@ -218,7 +218,7 @@ function Dashboard() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Ad</TableCell>
+                    <TableCell>Id</TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Telefon</TableCell>
                     <TableCell>Maşın</TableCell>
@@ -228,7 +228,7 @@ function Dashboard() {
                 <TableBody>
                   {stats.recentCustomers.map((customer) => (
                     <TableRow key={customer._id}>
-                      <TableCell>{customer.name}</TableCell>
+                      <TableCell>{customer.customerId}</TableCell>
                       <TableCell>{customer.email}</TableCell>
                       <TableCell>{customer.phone}</TableCell>
                       <TableCell>
