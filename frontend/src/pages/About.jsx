@@ -4,6 +4,10 @@ import {
   GlobeAltIcon,
   TrophyIcon,
   HeartIcon,
+  // Removed icons for technology
+  // BoltIcon,
+  // CloudIcon,
+  // ShieldCheckIcon as SecurityIcon
 } from '@heroicons/react/24/outline';
 
 const About = () => {
@@ -30,21 +34,22 @@ const About = () => {
     },
   ];
 
+  // Restored the team data with placeholder images
   const team = [
     {
       name: 'Əli Məmmədov',
       position: 'CEO',
-      image: '/team/ceo.jpg',
+      image: 'https://img.freepik.com/free-photo/portrait-cheerful-male-office-worker-posing-camera-holding-takeaway-coffee-silver-laptop-isolated-gray-wall_171337-626.jpg?t=st=1748432758~exp=1748436358~hmac=9391da697577e20ad621d3afe39a6f9fe812729ff32a6745d2c7dd221573fff8&w=1060', // Placeholder for CEO
     },
     {
       name: 'Ayşə Əliyeva',
       position: 'CTO',
-      image: '/team/cto.jpg',
+      image: 'https://img.freepik.com/free-photo/portrait-cheerful-male-office-worker-posing-camera-holding-takeaway-coffee-silver-laptop-isolated-gray-wall_171337-626.jpg?t=st=1748432758~exp=1748436358~hmac=9391da697577e20ad621d3afe39a6f9fe812729ff32a6745d2c7dd221573fff8&w=1060', // Placeholder for CTO
     },
     {
       name: 'Məhəmməd Həsənov',
       position: 'Müştəri Xidmətləri Müdiri',
-      image: '/team/customer-service.jpg',
+      image: 'https://img.freepik.com/free-photo/portrait-cheerful-male-office-worker-posing-camera-holding-takeaway-coffee-silver-laptop-isolated-gray-wall_171337-626.jpg?t=st=1748432758~exp=1748436358~hmac=9391da697577e20ad621d3afe39a6f9fe812729ff32a6745d2c7dd221573fff8&w=1060', // Placeholder for Customer Service
     },
   ];
 
@@ -109,14 +114,14 @@ const About = () => {
           className="relative h-96"
         >
           <img
-            src="/about/office.jpg"
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80"
             alt="CarTrack Office"
             className="rounded-lg object-cover w-full h-full"
           />
         </motion.div>
       </div>
 
-      {/* Team Section */}
+      {/* Restored Team Section */}
       <div className="mb-16">
         <h2 className="text-3xl font-bold text-center mb-12">Komandamız</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
