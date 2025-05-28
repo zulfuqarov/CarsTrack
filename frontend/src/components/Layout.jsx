@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-
+import Logo from "../assets/logo.png"
 const Layout = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
@@ -23,7 +23,9 @@ const Layout = ({ children }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-blue-600">CarsTrack</span>
+              <span className="text-2xl font-bold text-blue-600">
+                <img src={Logo} alt="CarsTrack Logo" className="h-[120px] w-auto" />
+              </span>
             </Link>
 
             {/* Desktop Navigation */}
