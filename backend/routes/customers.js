@@ -208,4 +208,29 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// @route   GET api/customers/customerId/:customerId
+// @desc    Get customer by customerId
+// @access  Public
+router.get('/customerId/:customerId', async (req, res) => {
+  try {
+    const customer = await Customer.findOne({ customerId: req.params.customerId });
+    if (!customer) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Müştəri tapılmadı' 
+      });
+    }
+    res.json({
+      success: true,
+      data: customer
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({
+      success: false,
+      message: 'Server xətası'
+    });
+  }
+});
+
 module.exports = router; 
