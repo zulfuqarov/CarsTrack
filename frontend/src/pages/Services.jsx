@@ -7,6 +7,7 @@ import {
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
 const Services = () => {
   const services = [
@@ -138,9 +139,11 @@ const Services = () => {
         <p className="text-lg mb-6">
           Avtomobilinizin izlənməsi üçün bizimlə əlaqə saxlayın
         </p>
-        <button className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
+        <Link
+          to="/contact"
+          className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors duration-200 ">
           Əlaqə
-        </button>
+        </Link>
       </motion.div>
     </div>
   );
