@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -26,20 +27,34 @@ const Cars = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const fetchCustomerData = async (customerId) => {
+    try {
+      const response = await axios.get(`http://localhost:2323/api/customers/customerId/${customerId}`);
+      console.log('Yeni API məlumatları:', response.data);
+      setCustomerData(response.data.data);
+      localStorage.setItem('customerData', JSON.stringify(response.data));
+    } catch (error) {
+      console.error('API xətası:', error);
+      setCustomerData(null);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
     const storedData = localStorage.getItem('customerData');
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
-        console.log('API məlumatları:', parsedData.data);
-        console.log('Avtomobil statusu:', parsedData.data.car.status);
-        console.log('Tracking Links:', parsedData.data.car.trackingLinks);
-        setCustomerData(parsedData.data);
+        const customerId = parsedData.data.customerId;
+        // Hər refresh zamanı yeni məlumatları gətir
+        fetchCustomerData(customerId);
       } catch (error) {
         console.error('JSON parse xətası:', error);
+        setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const statusColors = {
@@ -238,19 +253,18 @@ const Cars = () => {
                     <div key={category}>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">{title}</h3>
                       {customerData.images[category] && customerData.images[category].length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {customerData.images[category].map((image, index) => (
                             <div
                               key={index}
-                              className="relative aspect-video group cursor-pointer"
+                              className="relative aspect-[4/3] group cursor-pointer"
                               onClick={() => handleImageClick(category, image, index)}
                             >
                               <img
                                 src={image}
                                 alt={`${title} ${index + 1}`}
-                                className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                                className="w-full h-full object-contain rounded-lg transition-all duration-300 group-hover:opacity-80 bg-gray-50"
                               />
-                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 rounded-lg" />
                             </div>
                           ))}
                         </div>
@@ -322,19 +336,19 @@ const Cars = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
             onClick={() => setSelectedImage(null)}
           >
-            <div className="relative max-w-4xl w-full mx-4">
+            <div className="relative w-[90%] max-w-3xl mx-4">
               <button
-                className="absolute top-4 right-4 text-white hover:text-gray-300"
+                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors duration-200"
                 onClick={() => setSelectedImage(null)}
               >
                 <XMarkIcon className="h-8 w-8" />
               </button>
               
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors duration-200"
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePrevImage();
@@ -344,7 +358,7 @@ const Cars = () => {
               </button>
               
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors duration-200"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNextImage();
@@ -353,12 +367,14 @@ const Cars = () => {
                 <ChevronRightIcon className="h-8 w-8" />
               </button>
 
-              <img
-                src={selectedImage.url}
-                alt="Selected"
-                className="w-full h-auto rounded-lg"
-                onClick={(e) => e.stopPropagation()}
-              />
+              <div className="relative aspect-video">
+                <img
+                  src={selectedImage.url}
+                  alt="Selected"
+                  className="w-full h-full object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
             </div>
           </motion.div>
         )}
