@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -9,14 +10,21 @@ import {
   DocumentTextIcon,
   BuildingOfficeIcon,
   ClockIcon,
-  LinkIcon
+  LinkIcon,
+  XMarkIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
 
 const Cars = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [customerData, setCustomerData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const storedData = localStorage.getItem('customerData');
@@ -54,6 +62,41 @@ const Cars = () => {
     'unloading': 'Boşaldılır'
   };
 
+  const imageCategories = {
+    auction: 'Hərrac Şəkilləri',
+    americanDepot: 'Amerika Deposu Şəkilləri',
+    containerLoading: 'Konteyner Yükləmə Şəkilləri',
+    containerUnloading: 'Konteyner Boşaltma Şəkilləri',
+    bakuRoad: 'Bakı Yolu Şəkilləri',
+    bakuCustoms: 'Bakı Gömrük Şəkilləri'
+  };
+
+  const handleImageClick = (category, imageUrl, index) => {
+    setSelectedImage({ category, url: imageUrl });
+    setCurrentImageIndex(index);
+  };
+
+  const handleNextImage = () => {
+    if (!customerData.images) return;
+    const allImages = Object.values(customerData.images).flat();
+    const nextIndex = (currentImageIndex + 1) % allImages.length;
+    setCurrentImageIndex(nextIndex);
+    setSelectedImage({ url: allImages[nextIndex] });
+  };
+
+  const handlePrevImage = () => {
+    if (!customerData.images) return;
+    const allImages = Object.values(customerData.images).flat();
+    const prevIndex = (currentImageIndex - 1 + allImages.length) % allImages.length;
+    setCurrentImageIndex(prevIndex);
+    setSelectedImage({ url: allImages[prevIndex] });
+  };
+
+  const handleClearData = () => {
+    localStorage.removeItem('customerData');
+    navigate('/');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -82,9 +125,18 @@ const Cars = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Avtomobil İzləmə</h1>
-          <p className="text-gray-600">Müştəri ID: {customerData.customerId}</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Avtomobil İzləmə</h1>
+            <p className="text-gray-600">Müştəri ID: {customerData.customerId}</p>
+          </div>
+          <button
+            onClick={handleClearData}
+            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+          >
+            <TrashIcon className="h-5 w-5" />
+            <span>Təmizlə</span>
+          </button>
         </div>
 
         {/* Main Content */}
@@ -181,42 +233,32 @@ const Cars = () => {
                 className="bg-white rounded-xl shadow-sm p-6"
               >
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Avtomobil Şəkilləri</h2>
-                <div className="space-y-6">
-                  {/* Auction Images */}
-                  {customerData.images.auction && customerData.images.auction.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">Hərrac Şəkilləri</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {customerData.images.auction.map((image, index) => (
-                          <div key={index} className="relative aspect-video group">
-                            <img
-                              src={image}
-                              alt={`Hərrac şəkli ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                            />
-                          </div>
-                        ))}
-                      </div>
+                <div className="space-y-8">
+                  {Object.entries(imageCategories).map(([category, title]) => (
+                    <div key={category}>
+                      <h3 className="text-lg font-medium text-gray-900 mb-3">{title}</h3>
+                      {customerData.images[category] && customerData.images[category].length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {customerData.images[category].map((image, index) => (
+                            <div
+                              key={index}
+                              className="relative aspect-video group cursor-pointer"
+                              onClick={() => handleImageClick(category, image, index)}
+                            >
+                              <img
+                                src={image}
+                                alt={`${title} ${index + 1}`}
+                                className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300 rounded-lg" />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-center py-4">Şəkil mövcud deyil</p>
+                      )}
                     </div>
-                  )}
-
-                  {/* Other Images */}
-                  {customerData.images.other && customerData.images.other.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">Digər Şəkillər</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {customerData.images.other.map((image, index) => (
-                          <div key={index} className="relative aspect-video group">
-                            <img
-                              src={image}
-                              alt={`Digər şəkil ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -272,6 +314,55 @@ const Cars = () => {
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+            onClick={() => setSelectedImage(null)}
+          >
+            <div className="relative max-w-4xl w-full mx-4">
+              <button
+                className="absolute top-4 right-4 text-white hover:text-gray-300"
+                onClick={() => setSelectedImage(null)}
+              >
+                <XMarkIcon className="h-8 w-8" />
+              </button>
+              
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrevImage();
+                }}
+              >
+                <ChevronLeftIcon className="h-8 w-8" />
+              </button>
+              
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNextImage();
+                }}
+              >
+                <ChevronRightIcon className="h-8 w-8" />
+              </button>
+
+              <img
+                src={selectedImage.url}
+                alt="Selected"
+                className="w-full h-auto rounded-lg"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
