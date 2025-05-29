@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
 import { 
@@ -289,21 +294,41 @@ const Cars = () => {
                     <div key={category}>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">{title}</h3>
                       {customerData.images[category] && customerData.images[category].length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Swiper
+                          modules={[Navigation, Pagination, Autoplay]}
+                          spaceBetween={20}
+                          slidesPerView={1}
+                          navigation
+                          pagination={{ clickable: true }}
+                          // autoplay={{
+                          //   delay: 3000,
+                          //   disableOnInteraction: false,
+                          // }}
+                          breakpoints={{
+                            640: {
+                              slidesPerView: 2,
+                            },
+                            1024: {
+                              slidesPerView: 3,
+                            },
+                          }}
+                          className="w-full"
+                        >
                           {customerData.images[category].map((image, index) => (
-                            <div
-                              key={index}
-                              className="relative aspect-[4/3] group cursor-pointer"
-                              onClick={(e) => handleImageClick(category, image, index)}
-                            >
-                              <img
-                                src={image}
-                                alt={`${title} ${index + 1}`}
-                                className="w-full h-full object-contain rounded-lg transition-all duration-300 group-hover:opacity-80 bg-gray-50"
-                              />
-                            </div>
+                            <SwiperSlide key={index}>
+                              <div
+                                className="relative aspect-[4/3] group cursor-pointer"
+                                onClick={() => handleImageClick(category, image, index)}
+                              >
+                                <img
+                                  src={image}
+                                  alt={`${title} ${index + 1}`}
+                                  className="w-full h-full object-contain rounded-lg transition-all duration-300 group-hover:opacity-80 bg-gray-50"
+                                />
+                              </div>
+                            </SwiperSlide>
                           ))}
-                        </div>
+                        </Swiper>
                       ) : (
                         <p className="text-gray-500 text-center py-4">Şəkil mövcud deyil</p>
                       )}
