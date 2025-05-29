@@ -33,7 +33,7 @@ const Cars = () => {
 
   const fetchCustomerData = async (customerId) => {
     try {
-      const response = await axios.get(`http://localhost:2323/api/customers/customerId/${customerId}`);
+      const response = await axios.get(`https://api.autonex360.online/api/customers/customerId/${customerId}`);
       console.log('Yeni API məlumatları:', response.data);
       setCustomerData(response.data.data);
       localStorage.setItem('customerData', JSON.stringify(response.data));

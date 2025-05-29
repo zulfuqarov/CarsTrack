@@ -22,7 +22,7 @@ const Home = () => {
 
     try {
       console.log('Axtarış başladı:', searchQuery);
-      const response = await axios.get(`http://localhost:2323/api/customers/customerId/${searchQuery}`);
+      const response = await axios.get(`https://api.autonex360.online/api/customers/customerId/${searchQuery}`);
       console.log('API cavabı:', response.data);
 
       if (response.data) {
