@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:2323/api';
+const API_BASE_URL = 'https://api.autonex360.online/api';
 
 const API_ENDPOINTS = {
   AUTH: {
