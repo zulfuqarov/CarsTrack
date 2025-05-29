@@ -93,8 +93,11 @@ const Layout = ({ children }) => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-semibold mb-4">CarsTrack</h3>
-              <p className="text-gray-400">
+            <Link to="/" className="flex items-center space-x-2">
+              <span className="text-2xl font-bold text-blue-600">
+                <img src={Logo} alt="CarsTrack Logo" className="h-[120px] w-auto" />
+              </span>
+            </Link>              <p className="text-gray-400">
                 Avtomobilinizi real vaxtda izləyin və statusunu öyrənin.
               </p>
             </div>
@@ -116,9 +119,10 @@ const Layout = ({ children }) => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Əlaqə</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Email: info@carstrack.com</li>
-                <li>Tel: +994 50 123 45 67</li>
-                <li>Ünvan: Bakı şəhəri</li>
+                <li>Email: info@autonex360.online</li>
+                <li>Tel: +994 70 966 81 11</li>
+                <li>Tel: +994 70 964 64 66</li>
+                <li>Ünvan: Bakı şəhəri,Bakıxanov qəs</li>
               </ul>
             </div>
             <div>
@@ -137,16 +141,17 @@ const Layout = ({ children }) => {
                   Instagram
                 </a>
                 <a
-                  href="#"
+                  href="https://www.tiktok.com/@autonex1?_t=ZS-8wlKcSIcXVH&_r=1"
+                  target="_blank"
                   className="text-gray-400 hover:text-white transition-colors duration-200"
                 >
-                  LinkedIn
+                  TikTok
                 </a>
               </div>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 CarsTrack. Bütün hüquqlar qorunur.</p>
+            <p>&copy; 2024 AutoNex360. Bütün hüquqlar qorunur.</p>
           </div>
         </div>
       </footer>

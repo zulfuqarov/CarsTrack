@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MagnifyingGlassIcon, TruckIcon, MapIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -213,9 +214,11 @@ const Home = () => {
           <p className="text-xl mb-8">
             Avtomobilinizin statusunu izləmək üçün bizimlə əlaqə saxlayın
           </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
+          <Link
+          to="/contact"
+          className="bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
             Əlaqə
-          </button>
+          </Link>
         </div>
       </section>
     </div>

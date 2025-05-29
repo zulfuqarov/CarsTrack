@@ -33,22 +33,22 @@ const Contact = () => {
     {
       icon: <PhoneIcon className="h-6 w-6 text-blue-600" />,
       title: 'Telefon',
-      content: '+994 50 123 45 67',
+      content: '+994 70 966 81 11',
     },
     {
       icon: <EnvelopeIcon className="h-6 w-6 text-blue-600" />,
       title: 'Email',
-      content: 'info@cartrack.az',
+      content: 'info@autonex360.online',
     },
     {
       icon: <MapPinIcon className="h-6 w-6 text-blue-600" />,
       title: 'Ünvan',
-      content: 'Bakı şəhəri, Nərimanov rayonu',
+      content: 'Bakı şəhəri, Bakıxanov qəs',
     },
     {
       icon: <ClockIcon className="h-6 w-6 text-blue-600" />,
       title: 'İş Saatları',
-      content: 'Bazar ertəsi - Şənbə: 09:00 - 18:00',
+      content: 'Həftənin 7 günü, saat 10:00-dan 22:00-dək Xidmətinizdə',
     },
   ];
 
@@ -177,7 +177,7 @@ const Contact = () => {
           {/* Map */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3039.4283901491!2d49.8517568!3d40.3771909!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40307d079efb5163%3A0xc20aa51a5f0b5e01!2sNarimanov%20district%2C%20Baku!5e0!3m2!1sen!2saz!4v1647881234567!5m2!1sen!2saz"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d24297.97197137078!2d49.93264659763894!3d40.4255404023319!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4030623a1e06d9ed%3A0xd97657279cc3c71a!2sBakikhanov%2C%20Bak%C3%BC!5e0!3m2!1str!2saz!4v1748531126131!5m2!1str!2saz"
               width="100%"
               height="300"
               style={{ border: 0 }}
@@ -204,10 +204,11 @@ const Contact = () => {
                 Instagram
               </a>
               <a
-                href="#"
+                href="https://www.tiktok.com/@autonex1?_t=ZS-8wlKcSIcXVH&_r=1"
+                target='_blank'
                 className="text-gray-600 hover:text-blue-600 transition-colors duration-200"
               >
-                LinkedIn
+                TikTok
               </a>
               <a
                 href="#"

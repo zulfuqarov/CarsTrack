@@ -71,7 +71,7 @@ const About = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-xl text-gray-600 max-w-2xl mx-auto"
         >
-          CarTrack - Avtomobil izləmə sistemləri sahəsində lider şirkət
+          AutoNex360 - Avtomobil izləmə sistemləri sahəsində lider şirkət
         </motion.p>
       </div>
 
@@ -101,10 +101,10 @@ const About = () => {
         >
           <h2 className="text-3xl font-bold mb-6">Bizim Hekayəmiz</h2>
           <p className="text-gray-600 mb-4">
-            2014-cü ildə yaradılan CarTrack, avtomobil izləmə sistemləri sahəsində innovativ həllər təqdim edən lider şirkətdir. Bizim missiyamız müştərilərimizə ən yaxşı xidməti təqdim etmək və avtomobil izləmə prosesini asanlaşdırmaqdır.
+            2014-cü ildə yaradılan AutoNex360, avtomobil izləmə sistemləri sahəsində innovativ həllər təqdim edən lider şirkətdir. Bizim missiyamız müştərilərimizə ən yaxşı xidməti təqdim etmək və avtomobil izləmə prosesini asanlaşdırmaqdır.
           </p>
           <p className="text-gray-600">
-            Bu gün CarTrack, dünyanın 50-dən çox ölkəsində fəaliyyət göstərir və minlərlə məmnun müştəriyə xidmət edir. Biz daim yeni texnologiyaları tətbiq edərək və müştəri təcrübəsini təkmilləşdirərək öz liderliyimizi möhkəmləndiririk.
+            Bu gün AutoNex360, dünyanın 50-dən çox ölkəsində fəaliyyət göstərir və minlərlə məmnun müştəriyə xidmət edir. Biz daim yeni texnologiyaları tətbiq edərək və müştəri təcrübəsini təkmilləşdirərək öz liderliyimizi möhkəmləndiririk.
           </p>
         </motion.div>
         <motion.div
@@ -115,14 +115,14 @@ const About = () => {
         >
           <img
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80"
-            alt="CarTrack Office"
+            alt="AutoNex360 Office"
             className="rounded-lg object-cover w-full h-full"
           />
         </motion.div>
       </div>
 
       {/* Restored Team Section */}
-      <div className="mb-16">
+      {/* <div className="mb-16">
         <h2 className="text-3xl font-bold text-center mb-12">Komandamız</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {team.map((member, index) => (
@@ -145,7 +145,7 @@ const About = () => {
             </motion.div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Values Section */}
       <div className="bg-gray-50 rounded-lg p-8">
